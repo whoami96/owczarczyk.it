@@ -1,6 +1,7 @@
 services:
   web:
-    build: .
+    image: ghcr.io/whoami96/owczarczyk.it:main
+    container_name: owczarczyk-it
     ports:
-      - "8080:80"
+      - "8084:80"
     restart: always
