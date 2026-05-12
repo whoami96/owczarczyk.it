@@ -54,7 +54,7 @@ const App = () => {
     {
       title: "DevOps & Automatyzacja",
       icon: <Terminal className="w-8 h-8 text-emerald-500" />,
-      description: "Automatyzacja procesów CI/CD, konteneryzacja aplikacji oraz zarządzanie infrastrukturą jako kod (IaC).",
+      description: "Automatyzacja procesów CI/CD, konteneryzacja aplikacji oraz zarządzanie infrastruktrukturą jako kod (IaC).",
       tags: ["Kubernetes", "Docker", "Podman", "Terraform", "OpenTofu", "Ansible"]
     },
     {
@@ -93,9 +93,9 @@ const App = () => {
     <div className="min-h-screen bg-slate-900 text-slate-300 selection:bg-emerald-500/30 overflow-x-hidden">
       {/* Hero Section */}
       <header className="container mx-auto px-4 sm:px-6 pt-12 md:pt-24 pb-12 md:pb-16 text-center">
-        <div className="min-h-[4rem] mb-6 md:mb-8 flex justify-center items-center px-2">
-          <div key={activeBadge} className="animate-badge inline-block p-2 px-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 max-w-full">
-            <span className="text-emerald-500 font-mono text-[10px] xs:text-xs sm:text-sm tracking-wider uppercase text-center block leading-relaxed">
+        <div className="mb-6 md:mb-8 flex justify-center items-center px-2">
+          <div key={activeBadge} className="animate-badge inline-flex items-center justify-center p-2.5 px-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 max-w-full min-h-[3.5rem] md:min-h-[3rem]">
+            <span className="text-emerald-500 font-mono text-[11px] xs:text-xs sm:text-sm tracking-wider uppercase text-center leading-normal block">
               {badges[activeBadge]}
             </span>
           </div>
