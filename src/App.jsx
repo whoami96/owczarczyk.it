@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Server, 
-  ShieldCheck, 
-  Cpu, 
-  Terminal, 
-  Mail, 
-  Link, 
+import { useState, useEffect } from 'react';
+import {
+  Server,
+  Cpu,
+  Terminal,
+  Mail,
   ExternalLink,
   Database,
   Cloud,
-  Code,
   ArrowRight,
   MapPin,
-  Globe
+  Globe,
 } from 'lucide-react';
 
 const GitHubIcon = ({ className }) => (
@@ -104,13 +101,13 @@ const App = () => {
           owczarczyk<span className="text-emerald-500">.</span>it
         </h1>
         <p className="text-base sm:text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed mb-10 px-2">
-          Pomagam budować infrastrukturę, która po prostu działa. 
+          Pomagam budować infrastrukturę, która po prostu działa.
           <span className="block mt-4 text-slate-500 text-sm sm:text-lg md:text-xl font-light italic">
-            "Łączę 6-letnie doświadczenie z pasją do rozwiązań on-premise. 
+            "Łączę 6-letnie doświadczenie z pasją do rozwiązań on-premise.
             Dbam o to, aby Twoje systemy były bezpieczne, dane zawsze dostępne, a procesy IT w pełni zautomatyzowane."
           </span>
         </p>
-        
+
         <div className="flex flex-col sm:flex-row justify-center gap-4 px-4">
           <a href="mailto:kontakt@owczarczyk.it" className="flex items-center justify-center gap-2 px-8 py-4 bg-emerald-500 text-slate-900 rounded-xl font-bold hover:bg-emerald-400 transition-all shadow-lg shadow-emerald-500/20 w-full sm:w-auto text-sm sm:text-base">
             Porozmawiajmy o projekcie
@@ -174,7 +171,7 @@ const App = () => {
             </div>
             <h3 className="text-base sm:text-xl font-bold text-emerald-500 mb-6 font-mono uppercase tracking-widest">Dlaczego on-premise?</h3>
             <blockquote className="text-xl sm:text-3xl text-white font-light leading-snug italic">
-              "Wierzę, że własna, dobrze zoptymalizowana infrastruktura to nie tylko większe bezpieczeństwo, 
+              "Wierzę, że własna, dobrze zoptymalizowana infrastruktura to nie tylko większe bezpieczeństwo,
               ale przede wszystkim realna wolność od rosnących kosztów publicznych chmur."
             </blockquote>
           </div>
@@ -189,10 +186,10 @@ const App = () => {
 
           <h2 className="text-3xl sm:text-4xl font-bold mb-6 relative z-10 text-slate-900">Zacznijmy współpracę</h2>
           <p className="text-emerald-950/80 text-base sm:text-lg mb-8 md:mb-10 max-w-xl mx-auto relative z-10 font-medium px-2">
-            Szukasz wsparcia w automatyzacji, budowie serwera w biurze lub migracji z chmury? 
+            Szukasz wsparcia w automatyzacji, budowie serwera w biurze lub migracji z chmury?
             Napisz do mnie – porozmawiamy o Twoim projekcie.
           </p>
-          
+
           <div className="flex flex-col lg:flex-row justify-center items-center gap-4 relative z-10 mb-10">
             <a href="mailto:kontakt@owczarczyk.it" className="flex items-center gap-3 px-6 sm:px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-black transition-colors shadow-xl w-full sm:w-auto justify-center text-sm sm:text-base">
               <Mail className="w-5 h-5" />
