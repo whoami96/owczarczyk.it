@@ -1,7 +1,13 @@
 {
   "name": "owczarczyk.it",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Professional business card website for DevOps and IT Infrastructure specialist",
+  "author": "Paweł Owczarczyk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whoami96/owczarczyk.it.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

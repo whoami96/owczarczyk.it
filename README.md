@@ -1,8 +1,8 @@
 # owczarczyk.it - Professional Business Card
 
-Nowoczesna strona-wizytówka zbudowana z myślą o profesjonalnym wizerunku w świecie DevOps i infrastruktury IT.
+A modern business card website built for a professional image in the world of DevOps and IT infrastructure.
 
-## 🚀 Technologia
+## 🚀 Technology
 
 - **React 19**
 - **Tailwind CSS 4**
@@ -10,44 +10,44 @@ Nowoczesna strona-wizytówka zbudowana z myślą o profesjonalnym wizerunku w ś
 - **Lucide React** (Icons)
 - **Podman / Docker** (Containerization)
 
-## ✨ Funkcje
+## ✨ Features
 
-- **Dynamiczny Hero Section:** Rotujące motta biznesowe i techniczne.
-- **Tech Stack Marquee:** Animowany pasek technologii z efektem hover.
-- **Usługi:** Przejrzysta siatka oferowanych usług (On-premise, DevOps, Observability, Migracje).
-- **Responsive Design:** Pełna obsługa urządzeń mobilnych i desktopów.
-- **SEO Ready:** Skonfigurowane metatagi Open Graph dla lepszego podglądu w mediach społecznościowych.
-- **Custom Favicon:** Unikalna ikona terminala `>_`.
+- **Dynamic Hero Section:** Rotating business and technical mottos.
+- **Tech Stack Marquee:** Animated technology bar with hover effects.
+- **Services:** Clear grid of offered services (On-premise, DevOps, Observability, Migrations).
+- **Responsive Design:** Full support for mobile and desktop devices.
+- **SEO Ready:** Configured Open Graph metatags for better social media previews.
+- **Custom Favicon:** Unique terminal icon `>_`.
 
-## 🛠️ Uruchomienie lokalne
+## 🛠️ Local Setup
 
-### Wymagania
-- Podman (rekomendowane) lub Docker
-- Podman-compose lub Docker-compose
+### Prerequisites
+- Podman (recommended) or Docker
+- Podman-compose or Docker-compose
 
-### Instrukcja
-1. Sklonuj repozytorium:
+### Instructions
+1. Clone the repository:
    ```bash
    git clone https://github.com/whoami96/owczarczyk.it.git
    cd owczarczyk.it
    ```
 
-2. Uruchom kontener:
+2. Run the container:
    ```bash
    podman-compose up -d --build
    ```
-   LUB (ręcznie):
+   OR (manually):
    ```bash
    podman build -t owczarczyk-it .
-   podman run -d --name wizytowka -p 8080:80 owczarczyk-it
+   podman run -d --name business-card -p 8080:80 owczarczyk-it
    ```
 
-3. Strona będzie dostępna pod adresem: `http://localhost:8080`
+3. The website will be available at: `http://localhost:8080`
 
-## 📦 Struktura projektu
-- `src/App.jsx` - Główny komponent strony i treści.
-- `src/index.css` - Konfiguracja Tailwind CSS i animacji.
-- `Dockerfile` - Instrukcja budowania obrazu Nginx (multi-stage build).
+## 📦 Project Structure
+- `src/App.jsx` - Main page component and content.
+- `src/index.css` - Tailwind CSS and animations configuration.
+- `Dockerfile` - Nginx image build instructions (multi-stage build).
 
 ---
 Built with 💚 by Gemini CLI for Paweł Owczarczyk.
