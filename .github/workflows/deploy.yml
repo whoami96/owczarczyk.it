@@ -54,6 +54,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
           source: "docker-compose.yml"
           target: "/opt/docker-compose/owczarczyk.it/"
 
@@ -63,9 +64,8 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
           script: |
             cd /opt/docker-compose/owczarczyk.it
-            # Create a .env file with the image tag if needed, but for simplicity we can use :main or :latest
-            # Or we can update the docker-compose.yml to use the image from GHCR
             docker compose pull
             docker compose up -d
