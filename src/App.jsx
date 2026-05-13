@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   Server,
   Cpu,
@@ -44,7 +45,19 @@ const App = () => {
   }, [badges.length]);
 
   const techStack = [
-    "Linux", "Kubernetes", "Docker", "Ansible", "Terraform", "Proxmox", "TrueNAS", "Ceph", "Grafana", "Prometheus", "Zabbix", "Loki", "WireGuard", "OpenStack"
+    { name: "Linux", slug: "linux", url: "https://www.linux.org/" },
+    { name: "Kubernetes", slug: "kubernetes", url: "https://kubernetes.io/" },
+    { name: "Docker", slug: "docker", url: "https://www.docker.com/" },
+    { name: "Ansible", slug: "ansible", url: "https://www.ansible.com/" },
+    { name: "Terraform", slug: "terraform", url: "https://www.terraform.io/" },
+    { name: "Proxmox", slug: "proxmox", url: "https://www.proxmox.com/" },
+    { name: "TrueNAS", slug: "truenas", url: "https://www.truenas.com/" },
+    { name: "Ceph", slug: "ceph", url: "https://ceph.com/" },
+    { name: "Grafana", slug: "grafana", url: "https://grafana.com/" },
+    { name: "Prometheus", slug: "prometheus", url: "https://prometheus.io/" },
+    { name: "Zabbix", slug: "zabbix", url: "https://www.zabbix.com/" },
+    { name: "WireGuard", slug: "wireguard", url: "https://www.wireguard.com/" },
+    { name: "OpenStack", slug: "openstack", url: "https://www.openstack.org/" }
   ];
 
   const services = [
@@ -89,7 +102,12 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-300 selection:bg-emerald-500/30 overflow-x-hidden">
       {/* Hero Section */}
-      <header className="container mx-auto px-4 sm:px-6 pt-12 md:pt-24 pb-12 md:pb-16 text-center">
+      <motion.header 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="container mx-auto px-4 sm:px-6 pt-12 md:pt-24 pb-12 md:pb-16 text-center"
+      >
         <div className="mb-6 md:mb-8 flex justify-center items-center px-2">
           <div key={activeBadge} className="animate-badge inline-flex items-center justify-center p-2.5 px-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 max-w-full min-h-[3.5rem] md:min-h-[3rem]">
             <span className="text-emerald-500 font-mono text-[11px] xs:text-xs sm:text-sm tracking-wider uppercase text-center leading-normal block">
@@ -118,31 +136,75 @@ const App = () => {
             GitHub
           </a>
         </div>
-      </header>
+      </motion.header>
 
       {/* Animated Tech Stack Bar */}
-      <div className="border-y border-slate-800 bg-slate-900/50 py-6 md:py-10 overflow-hidden relative">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5, duration: 1 }}
+        className="border-y border-slate-800 bg-slate-900/50 py-6 md:py-10 overflow-hidden relative"
+      >
         <div className="animate-marquee flex whitespace-nowrap">
           {[...techStack, ...techStack].map((tech, i) => (
-            <span key={i} className="text-lg sm:text-2xl font-bold font-mono tracking-tighter text-slate-500 mx-6 md:mx-12 hover:text-emerald-500 transition-colors cursor-default">
-              {tech}
-            </span>
+            <a 
+              key={i} 
+              href={tech.url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center gap-3 mx-6 md:mx-12 group cursor-pointer"
+            >
+              <img 
+                src={tech.slug === 'zabbix' ? '/zabbix.svg' : `https://api.iconify.design/simple-icons:${tech.slug}.svg?color=%2310b981`} 
+                alt={tech.name}
+                className="w-6 h-6 sm:w-8 sm:h-8 opacity-70 group-hover:opacity-100 transition-all"
+              />
+              <span className="text-lg sm:text-2xl font-bold font-mono tracking-tighter text-slate-500 group-hover:text-emerald-500 transition-colors">
+                {tech.name}
+              </span>
+            </a>
           ))}
         </div>
         <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-slate-900 to-transparent z-10"></div>
         <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-slate-900 to-transparent z-10"></div>
-      </div>
+      </motion.div>
 
       {/* Services Section */}
       <section className="container mx-auto px-4 sm:px-6 py-16 md:py-24">
-        <div className="flex items-center gap-4 mb-12 md:mb-16">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="flex items-center gap-4 mb-12 md:mb-16"
+        >
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Jak mogę pomóc?</h2>
           <div className="h-px flex-1 bg-slate-800"></div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16 md:mb-24">
+        <motion.div 
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={{
+            hidden: { opacity: 0 },
+            show: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.1
+              }
+            }
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16 md:mb-24"
+        >
           {services.map((service, index) => (
-            <div key={index} className="group p-6 sm:p-8 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/5">
+            <motion.div 
+              key={index}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                show: { opacity: 1, y: 0 }
+              }}
+              className="group p-6 sm:p-8 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/5"
+            >
               <div className="mb-6 inline-block p-3 rounded-xl bg-slate-900/50 border border-slate-700 group-hover:scale-110 transition-transform duration-300">
                 {service.icon}
               </div>
@@ -159,12 +221,18 @@ const App = () => {
                   </span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Philosophy Section */}
-        <div className="max-w-4xl mx-auto px-2">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="max-w-4xl mx-auto px-2"
+        >
           <div className="p-6 sm:p-12 rounded-2xl sm:rounded-3xl bg-emerald-500/5 border border-emerald-500/10 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
               <Terminal className="w-32 h-32 text-emerald-500" />
@@ -175,11 +243,17 @@ const App = () => {
               ale przede wszystkim realna wolność od rosnących kosztów publicznych chmur."
             </blockquote>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="container mx-auto px-4 sm:px-6 py-16 md:py-24 mb-8">
+      <motion.section 
+        id="contact" 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-4 sm:px-6 py-16 md:py-24 mb-8"
+      >
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-black/10 rounded-full blur-3xl"></div>
@@ -218,7 +292,7 @@ const App = () => {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 md:py-12 border-t border-slate-800 text-center text-slate-500 text-[10px] sm:text-xs md:text-sm font-mono">
