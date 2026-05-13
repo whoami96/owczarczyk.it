@@ -1,6 +1,6 @@
 services:
   web:
-    image: whoami96/owczarczyk.it:main
+    image: pawelowczarczyk/owczarczyk.it:main
     container_name: owczarczyk-it
     ports:
       - "8084:80"
