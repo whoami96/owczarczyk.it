@@ -9,6 +9,7 @@ import {
   Database,
   Cloud,
   ArrowRight,
+  ChevronUp,
   MapPin,
   Globe,
 } from 'lucide-react';
@@ -30,12 +31,39 @@ const LinkedInIcon = ({ className }) => (
 
 const App = () => {
   const [activeBadge, setActiveBadge] = useState(0);
+  const [displayText, setDisplayText] = useState("");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const fullText = "whoami";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const badges = [
     "Twój partner w świecie infrastruktury",
     "Proste rozwiązania dla skomplikowanych problemów",
     "Pasja do Linuxa, doświadczenie w DevOps",
-    "Twoja infrastruktura w dobrych rękach"
+    "Twoja infrastruktura w dobrych rękach",
+    "Infrastruktura, która nie zawodzi",
+    "Twój system w dobrych rękach"
   ];
+
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index <= fullText.length) {
+        setDisplayText(fullText.slice(0, index));
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 150);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,24 +128,133 @@ const App = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-300 selection:bg-emerald-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-900 text-slate-300 selection:bg-emerald-500/30 overflow-x-hidden relative bg-grid">
+      {/* Top Status Bar */}
+      <div className="bg-slate-950/80 backdrop-blur-md border-b border-slate-800 py-2 px-4 sticky top-0 z-50 overflow-hidden">
+        <div className="container mx-auto flex justify-between items-center text-[10px] sm:text-xs font-mono tracking-widest uppercase">
+          <div className="flex items-center gap-4 sm:gap-8">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-emerald-500 font-bold">System Online</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-500">
+              <MapPin className="w-3 h-3" />
+              <span>Location: Szczecin</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 sm:gap-8 text-slate-500">
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline">Uptime:</span>
+              <span className="text-slate-300">99.9%</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline">Env:</span>
+              <span className="text-emerald-500/80">Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <motion.header 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="container mx-auto px-4 sm:px-6 pt-12 md:pt-24 pb-12 md:pb-16 text-center"
+        className="container mx-auto px-4 sm:px-6 pt-12 md:pt-20 pb-12 md:pb-16 text-center"
       >
-        <div className="mb-6 md:mb-8 flex justify-center items-center px-2">
+        <div className="mb-8 md:mb-12 flex justify-center items-center px-2">
           <div key={activeBadge} className="animate-badge inline-flex items-center justify-center p-2.5 px-5 rounded-full bg-emerald-500/10 border border-emerald-500/20 max-w-full min-h-[3.5rem] md:min-h-[3rem]">
             <span className="text-emerald-500 font-mono text-[11px] xs:text-xs sm:text-sm tracking-wider uppercase text-center leading-normal block">
               {badges[activeBadge]}
             </span>
           </div>
         </div>
-        <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold text-white mb-6 md:mb-8 tracking-tight break-words px-2 leading-tight">
-          owczarczyk<span className="text-emerald-500">.</span>it
-        </h1>
+
+        {/* Modern Terminal UI */}
+        <div className="max-w-4xl mx-auto mb-12 px-2">
+          <div className="bg-slate-950 rounded-xl border border-slate-800 shadow-2xl overflow-hidden text-left font-mono">
+            {/* Terminal Header */}
+            <div className="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+              <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold ml-2">bash — 80x24</div>
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-slate-700 hover:bg-emerald-500/40 transition-colors"></div>
+                <div className="w-3 h-3 rounded-full bg-slate-700 hover:bg-amber-500/40 transition-colors"></div>
+                <div className="w-3 h-3 rounded-full bg-slate-700 hover:bg-red-500/40 transition-colors"></div>
+              </div>
+            </div>
+            
+            {/* Terminal Body */}
+            <div className="p-6 sm:p-10 min-h-[200px] sm:min-h-[350px]">
+              <div className="flex items-start gap-2 text-lg sm:text-2xl md:text-3xl mb-6 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-500 font-bold">owczarczykp@server</span>
+                  <span className="text-slate-500">:</span>
+                  <span className="text-blue-400">~</span>
+                  <span className="text-slate-500">$</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-slate-300">{displayText}</span>
+                  <span className="inline-block w-[3px] md:w-[6px] h-[1.1em] bg-emerald-500 ml-1 translate-y-[0.15em] animate-smooth-cursor"></span>
+                </div>
+              </div>
+              
+              {displayText === fullText && (
+                <motion.div 
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    show: {
+                      opacity: 1,
+                      transition: { staggerChildren: 0.15, delayChildren: 0.3 }
+                    }
+                  }}
+                  className="space-y-4 font-mono"
+                >
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">NAME:</span>
+                    <span className="text-slate-200">Paweł Owczarczyk</span>
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">EMAIL:</span>
+                    <span className="text-slate-200">kontakt@owczarczyk.it</span>
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">ROLE:</span>
+                    <span className="text-slate-200">Inżynier systemów informatycznych / DevOps</span>
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">EXP:</span>
+                    <span className="text-slate-200">6+ lat w IT</span>
+                  </motion.div>
+                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">STATUS:</span>
+                    <span className="text-emerald-400 font-bold flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                      Dostępny do współpracy
+                    </span>
+                  </motion.div>
+                  
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2, duration: 0.6 }}
+                    className="text-white text-3xl sm:text-6xl md:text-8xl font-bold tracking-tight pt-8 border-t border-slate-800/50 mt-8 flex items-center gap-3 sm:gap-6"
+                  >
+                    <Terminal className="w-8 h-8 sm:w-16 sm:h-16 md:w-20 md:h-20 text-emerald-500 shrink-0" />
+                    <span>
+                      owczarczyk<span className="text-emerald-500">.</span>it
+                    </span>
+                  </motion.div>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </div>
+
         <p className="text-base sm:text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed mb-10 px-2">
           Pomagam budować infrastrukturę, która po prostu działa.
           <span className="block mt-4 text-slate-500 text-sm sm:text-lg md:text-xl font-light italic">
@@ -298,8 +435,20 @@ const App = () => {
       <footer className="container mx-auto px-6 py-8 md:py-12 border-t border-slate-800 text-center text-slate-500 text-[10px] sm:text-xs md:text-sm font-mono">
         <p>&copy; {new Date().getFullYear()} owczarczyk.it | Built with React & Tailwind 4</p>
       </footer>
+
+      {/* Scroll to Top Button */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: showScrollTop ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={`fixed bottom-8 right-8 p-4 bg-emerald-500 text-slate-950 rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-95 z-40 hover:bg-emerald-400 group ${!showScrollTop ? 'pointer-events-none' : ''}`}
+        aria-label="Scroll to top"
+      >
+        <ChevronUp className="w-6 h-6 transition-transform group-hover:-translate-y-1" />
+      </motion.button>
     </div>
   );
-};
+};;
 
 export default App;
