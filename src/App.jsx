@@ -195,9 +195,9 @@ const App = () => {
                   <span className="text-blue-400">~</span>
                   <span className="text-slate-500">$</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center leading-none">
                   <span className="text-slate-300">{displayText}</span>
-                  <span className="inline-block w-[3px] md:w-[6px] h-[1.1em] bg-emerald-500 ml-1 translate-y-[0.15em] animate-smooth-cursor"></span>
+                  <span className="inline-block w-[3px] md:w-[6px] h-[1em] bg-emerald-500 ml-1 translate-y-[0.05em] animate-smooth-cursor"></span>
                 </div>
               </div>
               
