@@ -188,16 +188,16 @@ const App = () => {
             
             {/* Terminal Body */}
             <div className="p-6 sm:p-10 min-h-[200px] sm:min-h-[350px]">
-              <div className="flex items-start gap-2 text-lg sm:text-2xl md:text-3xl mb-6 flex-wrap">
+              <div className="flex items-center gap-x-2 text-lg sm:text-2xl md:text-3xl mb-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <span className="text-emerald-500 font-bold">owczarczykp@server</span>
                   <span className="text-slate-500">:</span>
                   <span className="text-blue-400">~</span>
                   <span className="text-slate-500">$</span>
                 </div>
-                <div className="flex items-center leading-none">
+                <div className="flex items-center">
                   <span className="text-slate-300">{displayText}</span>
-                  <span className="inline-block w-[3px] md:w-[6px] h-[1em] bg-emerald-500 ml-1 translate-y-[0.05em] animate-smooth-cursor"></span>
+                  <span className="inline-block w-[3px] md:w-[6px] h-[1.1em] bg-emerald-500 ml-1 animate-smooth-cursor"></span>
                 </div>
               </div>
               
