@@ -48,6 +48,8 @@ A modern business card website built for a professional image in the world of De
 - `src/App.jsx` - Main page component and content.
 - `src/index.css` - Tailwind CSS and animations configuration.
 - `Dockerfile` - Nginx image build instructions (multi-stage build).
+- `nginx/` - Nginx server config (gzip, caching, security headers incl. CSP).
+- `public/tech/` - Self-hosted tech stack icons (no third-party requests).
 
 ---
 Built with 💚 by Gemini CLI for Paweł Owczarczyk.
