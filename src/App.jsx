@@ -375,7 +375,7 @@ const App = () => {
                 hidden: { opacity: 0, y: 20 },
                 show: { opacity: 1, y: 0 }
               }}
-              className="group p-6 sm:p-8 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/5"
+              className="group p-6 sm:p-8 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:border-emerald-500/30 transition-[border-color,box-shadow] duration-300 hover:shadow-2xl hover:shadow-emerald-500/5"
             >
               <div className="mb-6 inline-block p-3 rounded-xl bg-slate-900/50 border border-slate-700 group-hover:scale-110 transition-transform duration-300">
                 {service.icon}
@@ -477,7 +477,7 @@ const App = () => {
         animate={{ opacity: showScrollTop ? 1 : 0 }}
         transition={{ duration: 0.3 }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-8 right-8 p-4 bg-emerald-500 text-slate-950 rounded-xl shadow-2xl transition-all hover:scale-110 active:scale-95 z-40 hover:bg-emerald-400 group ${!showScrollTop ? 'pointer-events-none' : ''}`}
+        className={`fixed bottom-8 right-8 p-4 bg-emerald-500 text-slate-950 rounded-xl shadow-2xl transition-[scale,background-color] hover:scale-110 active:scale-95 z-40 hover:bg-emerald-400 group ${!showScrollTop ? 'pointer-events-none' : ''}`}
         aria-label="Scroll to top"
       >
         <ChevronUp className="w-6 h-6 transition-transform group-hover:-translate-y-1" />
