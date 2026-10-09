@@ -1,7 +1,39 @@
 services:
   web:
-    image: wh0ami96/owczarczyk.it:main
+    # Rollback: IMAGE_TAG=sha-<commit> podman-compose up -d
+    image: wh0ami96/owczarczyk.it:${IMAGE_TAG:-main}
     container_name: owczarczyk-it
     ports:
       - "8084:80"
+    volumes:
+      - status:/usr/share/nginx/html/status:ro
     restart: always
+
+  # Exports the blackbox probe results for owczarczyk.it from VictoriaMetrics as static JSON for the status bar,
+  # so the monitoring stack never has to be reachable from the internet.
+  status:
+    image: docker.io/library/alpine:3.22
+    container_name: owczarczyk-it-status
+    environment:
+      VM_URL: http://host.containers.internal:8428
+    volumes:
+      - status:/status
+    # Queries are pre-URL-encoded (busybox wget doesn't encode):
+    #   up.json     = probe_success{instance="https://owczarczyk.it"}
+    #   uptime.json = avg_over_time(probe_success{instance="https://owczarczyk.it"}[30d])
+    command:
+      - sh
+      - -c
+      - |
+        fetch() {
+          wget -qO "/status/$$1.tmp" "$$VM_URL/api/v1/query?query=$$2" && mv "/status/$$1.tmp" "/status/$$1"
+        }
+        while true; do
+          fetch up.json 'probe_success%7Binstance%3D%22https%3A%2F%2Fowczarczyk.it%22%7D'
+          fetch uptime.json 'avg_over_time(probe_success%7Binstance%3D%22https%3A%2F%2Fowczarczyk.it%22%7D%5B30d%5D)'
+          sleep 60
+        done
+    restart: always
+
+volumes:
+  status:

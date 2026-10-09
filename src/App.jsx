@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotion, MotionConfig, domAnimation, m } from 'framer-motion';
 import {
   Server,
   Cpu,
   Terminal,
   Mail,
-  ExternalLink,
+  MessagesSquare,
   Database,
   Cloud,
   ArrowRight,
@@ -29,11 +29,30 @@ const LinkedInIcon = ({ className }) => (
   </svg>
 );
 
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+// Reads a VictoriaMetrics instant-query result written by the status sidecar (see docker-compose.yml).
+// Returns null when the file is missing, malformed or older than 5 minutes, so the bar never shows stale data.
+const fetchStatusValue = async (file) => {
+  try {
+    const res = await fetch(`/status/${file}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const [timestamp, value] = (await res.json()).data.result[0].value;
+    if (Date.now() / 1000 - timestamp > 300) return null;
+    return Number(value);
+  } catch {
+    return null;
+  }
+};
+
 const App = () => {
   const [activeBadge, setActiveBadge] = useState(0);
+  const fullText = "whoami";
   const [displayText, setDisplayText] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const fullText = "whoami";
+  const [status, setStatus] = useState({ up: null, uptime: null });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +61,20 @@ const App = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const load = async () => {
+      const [up, uptime] = await Promise.all([fetchStatusValue('up.json'), fetchStatusValue('uptime.json')]);
+      setStatus({ up, uptime });
+    };
+    load();
+    const interval = setInterval(load, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const isDegraded = status.up === 0;
+  // Floor instead of round, so 99.997% shows as 99.99% rather than 100.00%
+  const uptimeLabel = status.uptime === null ? '—' : `${(Math.floor(status.uptime * 10000) / 100).toFixed(2)}%`;
 
   const badges = [
     "Twój partner w świecie infrastruktury",
@@ -53,7 +86,7 @@ const App = () => {
   ];
 
   useEffect(() => {
-    let index = 0;
+    let index = prefersReducedMotion ? fullText.length : 0;
     const interval = setInterval(() => {
       if (index <= fullText.length) {
         setDisplayText(fullText.slice(0, index));
@@ -92,7 +125,7 @@ const App = () => {
     {
       title: "DevOps & Automatyzacja",
       icon: <Terminal className="w-8 h-8 text-emerald-500" />,
-      description: "Automatyzacja procesów CI/CD, konteneryzacja aplikacji oraz zarządzanie infrastruktrukturą jako kod (IaC).",
+      description: "Automatyzacja procesów CI/CD, konteneryzacja aplikacji oraz zarządzanie infrastrukturą jako kod (IaC).",
       tags: ["Kubernetes", "Docker", "Podman", "Terraform", "OpenTofu", "Ansible"]
     },
     {
@@ -121,13 +154,15 @@ const App = () => {
     },
     {
       title: "Konsultacje IT",
-      icon: <ExternalLink className="w-8 h-8 text-emerald-500" />,
+      icon: <MessagesSquare className="w-8 h-8 text-emerald-500" />,
       description: "Niezależne doradztwo technologiczne, wsparcie w wyborze sprzętu oraz optymalizacja architektury.",
       tags: ["Doradztwo techniczne", "Dobór sprzętu", "Architektura IT", "Optymalizacja"]
     }
   ];
 
   return (
+    <LazyMotion features={domAnimation} strict>
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen bg-slate-900 text-slate-300 selection:bg-emerald-500/30 overflow-x-hidden relative bg-grid">
       {/* Top Status Bar */}
       <div className="bg-slate-950/80 backdrop-blur-md border-b border-slate-800 py-2 px-4 sticky top-0 z-50 overflow-hidden">
@@ -135,10 +170,12 @@ const App = () => {
           <div className="flex items-center gap-4 sm:gap-8">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isDegraded ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${isDegraded ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
               </span>
-              <span className="text-emerald-500 font-bold">System Online</span>
+              <span className={`font-bold ${isDegraded ? 'text-amber-500' : 'text-emerald-500'}`}>
+                {isDegraded ? 'System Degraded' : 'System Online'}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-slate-500">
               <MapPin className="w-3 h-3" />
@@ -147,8 +184,8 @@ const App = () => {
           </div>
           <div className="flex items-center gap-4 sm:gap-8 text-slate-500">
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline">Uptime:</span>
-              <span className="text-slate-300">99.9%</span>
+              <span className="hidden sm:inline">Uptime 30d:</span>
+              <span className="text-slate-300" title="Blackbox probe, VictoriaMetrics">{uptimeLabel}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="hidden sm:inline">Env:</span>
@@ -159,7 +196,7 @@ const App = () => {
       </div>
 
       {/* Hero Section */}
-      <motion.header 
+      <m.header 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -201,56 +238,52 @@ const App = () => {
                 </div>
               </div>
               
-              {displayText === fullText && (
-                <motion.div 
-                  initial="hidden"
-                  animate="show"
-                  variants={{
-                    hidden: { opacity: 0 },
-                    show: {
-                      opacity: 1,
-                      transition: { staggerChildren: 0.15, delayChildren: 0.3 }
-                    }
-                  }}
-                  className="space-y-4 font-mono"
+              <m.div 
+                initial="hidden"
+                animate={displayText === fullText ? "show" : "hidden"}
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: { staggerChildren: 0.15, delayChildren: 0.3 }
+                  }
+                }}
+                className="space-y-4 font-mono"
+              >
+                <m.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                  <span className="text-emerald-500/90 uppercase tracking-wider text-xs sm:text-sm font-bold">NAME:</span>
+                  <span className="text-slate-200">Paweł Owczarczyk</span>
+                </m.div>
+                <m.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                  <span className="text-emerald-500/90 uppercase tracking-wider text-xs sm:text-sm font-bold">EMAIL:</span>
+                  <span className="text-slate-200 break-all">kontakt@owczarczyk.it</span>
+                </m.div>
+                <m.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                  <span className="text-emerald-500/90 uppercase tracking-wider text-xs sm:text-sm font-bold">ROLE:</span>
+                  <span className="text-slate-200">Inżynier systemów informatycznych / DevOps</span>
+                </m.div>
+                <m.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                  <span className="text-emerald-500/90 uppercase tracking-wider text-xs sm:text-sm font-bold">EXP:</span>
+                  <span className="text-slate-200">6+ lat w IT</span>
+                </m.div>
+                <m.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
+                  <span className="text-emerald-500/90 uppercase tracking-wider text-xs sm:text-sm font-bold">STATUS:</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    Dostępny do współpracy
+                  </span>
+                </m.div>
+                
+                <m.div 
+                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+                  className="text-white text-3xl sm:text-6xl md:text-8xl font-bold tracking-tight pt-8 border-t border-slate-800/50 mt-8 flex items-center gap-3 sm:gap-6"
                 >
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
-                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">NAME:</span>
-                    <span className="text-slate-200">Paweł Owczarczyk</span>
-                  </motion.div>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
-                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">EMAIL:</span>
-                    <span className="text-slate-200">kontakt@owczarczyk.it</span>
-                  </motion.div>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
-                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">ROLE:</span>
-                    <span className="text-slate-200">Inżynier systemów informatycznych / DevOps</span>
-                  </motion.div>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
-                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">EXP:</span>
-                    <span className="text-slate-200">6+ lat w IT</span>
-                  </motion.div>
-                  <motion.div variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-2 items-baseline text-sm sm:text-base md:text-lg">
-                    <span className="text-emerald-500/60 uppercase tracking-wider text-[10px] sm:text-xs font-bold">STATUS:</span>
-                    <span className="text-emerald-400 font-bold flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                      Dostępny do współpracy
-                    </span>
-                  </motion.div>
-                  
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2, duration: 0.6 }}
-                    className="text-white text-3xl sm:text-6xl md:text-8xl font-bold tracking-tight pt-8 border-t border-slate-800/50 mt-8 flex items-center gap-3 sm:gap-6"
-                  >
-                    <Terminal className="w-8 h-8 sm:w-16 sm:h-16 md:w-20 md:h-20 text-emerald-500 shrink-0" />
-                    <span>
-                      owczarczyk<span className="text-emerald-500">.</span>it
-                    </span>
-                  </motion.div>
-                </motion.div>
-              )}
+                  <Terminal className="w-8 h-8 sm:w-16 sm:h-16 md:w-20 md:h-20 text-emerald-500 shrink-0" />
+                  <span>
+                    owczarczyk<span className="text-emerald-500">.</span>it
+                  </span>
+                </m.div>
+              </m.div>
             </div>
           </div>
         </div>
@@ -273,10 +306,10 @@ const App = () => {
             GitHub
           </a>
         </div>
-      </motion.header>
+      </m.header>
 
       {/* Animated Tech Stack Bar */}
-      <motion.div 
+      <m.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
@@ -289,10 +322,12 @@ const App = () => {
               href={tech.url} 
               target="_blank" 
               rel="noopener noreferrer" 
+              aria-hidden={i >= techStack.length || undefined}
+              tabIndex={i >= techStack.length ? -1 : undefined}
               className="flex items-center gap-3 mx-6 md:mx-12 group cursor-pointer"
             >
               <img 
-                src={tech.slug === 'zabbix' ? '/zabbix.svg' : `https://api.iconify.design/simple-icons:${tech.slug}.svg?color=%2310b981`} 
+                src={`/tech/${tech.slug}.svg`}
                 alt={tech.name}
                 className="w-6 h-6 sm:w-8 sm:h-8 opacity-70 group-hover:opacity-100 transition-all"
               />
@@ -304,11 +339,11 @@ const App = () => {
         </div>
         <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-slate-900 to-transparent z-10"></div>
         <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-slate-900 to-transparent z-10"></div>
-      </motion.div>
+      </m.div>
 
       {/* Services Section */}
       <section className="container mx-auto px-4 sm:px-6 py-16 md:py-24">
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -316,9 +351,9 @@ const App = () => {
         >
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Jak mogę pomóc?</h2>
           <div className="h-px flex-1 bg-slate-800"></div>
-        </motion.div>
+        </m.div>
 
-        <motion.div 
+        <m.div 
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
@@ -334,7 +369,7 @@ const App = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16 md:mb-24"
         >
           {services.map((service, index) => (
-            <motion.div 
+            <m.div 
               key={index}
               variants={{
                 hidden: { opacity: 0, y: 20 },
@@ -353,17 +388,17 @@ const App = () => {
               </p>
               <div className="flex flex-wrap gap-2">
                 {service.tags.map((tag, tIdx) => (
-                  <span key={tIdx} className="px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-mono bg-slate-900/80 text-emerald-500/80 rounded-full border border-slate-700">
+                  <span key={tIdx} className="px-2 py-0.5 sm:px-3 sm:py-1 text-xs font-mono bg-slate-900/80 text-emerald-400 rounded-full border border-slate-700">
                     {tag}
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Philosophy Section */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -380,11 +415,11 @@ const App = () => {
               ale przede wszystkim realna wolność od rosnących kosztów publicznych chmur."
             </blockquote>
           </div>
-        </motion.div>
+        </m.div>
       </section>
 
       {/* Contact Section */}
-      <motion.section 
+      <m.section 
         id="contact" 
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -429,15 +464,15 @@ const App = () => {
             </div>
           </div>
         </div>
-      </motion.section>
+      </m.section>
 
       {/* Footer */}
-      <footer className="container mx-auto px-6 py-8 md:py-12 border-t border-slate-800 text-center text-slate-500 text-[10px] sm:text-xs md:text-sm font-mono">
-        <p>&copy; {new Date().getFullYear()} owczarczyk.it | Built with React & Tailwind 4</p>
+      <footer className="container mx-auto px-6 py-8 md:py-12 border-t border-slate-800 text-center text-slate-400 text-xs md:text-sm font-mono">
+        <p suppressHydrationWarning>&copy; {new Date().getFullYear()} owczarczyk.it | Built with React & Tailwind 4</p>
       </footer>
 
       {/* Scroll to Top Button */}
-      <motion.button
+      <m.button
         initial={{ opacity: 0 }}
         animate={{ opacity: showScrollTop ? 1 : 0 }}
         transition={{ duration: 0.3 }}
@@ -446,9 +481,11 @@ const App = () => {
         aria-label="Scroll to top"
       >
         <ChevronUp className="w-6 h-6 transition-transform group-hover:-translate-y-1" />
-      </motion.button>
+      </m.button>
     </div>
+    </MotionConfig>
+    </LazyMotion>
   );
-};;
+};
 
 export default App;
