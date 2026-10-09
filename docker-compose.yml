@@ -19,7 +19,8 @@ services:
     volumes:
       - status:/status
     # Queries are pre-URL-encoded (busybox wget doesn't encode):
-    #   up.json     = probe_success{instance="https://owczarczyk.it"}
+    #   up.json     = max_over_time(probe_success{instance="https://owczarczyk.it"}[2m])
+    #                 (0 only if every probe in the last 2 minutes failed, so restarts during deploys don't flag "degraded")
     #   uptime.json = avg_over_time(probe_success{instance="https://owczarczyk.it"}[30d])
     command:
       - sh
@@ -29,9 +30,9 @@ services:
           wget -qO "/status/$$1.tmp" "$$VM_URL/api/v1/query?query=$$2" && mv "/status/$$1.tmp" "/status/$$1"
         }
         while true; do
-          fetch up.json 'probe_success%7Binstance%3D%22https%3A%2F%2Fowczarczyk.it%22%7D'
+          fetch up.json 'max_over_time(probe_success%7Binstance%3D%22https%3A%2F%2Fowczarczyk.it%22%7D%5B2m%5D)'
           fetch uptime.json 'avg_over_time(probe_success%7Binstance%3D%22https%3A%2F%2Fowczarczyk.it%22%7D%5B30d%5D)'
-          sleep 60
+          sleep 30
         done
     restart: always
 
